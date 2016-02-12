@@ -1,3 +1,0 @@
-# Bash-Scripts-Work
-
-Hello
