@@ -1,0 +1,58 @@
+#!/bin/bash
+
+#Pushing file to hosts
+
+checkfile(){
+while [[ ! -e $list ]]; do
+        echo -e "\nFile $list doesn't exitst"
+        echo -e "Pleas enter the list of IP(txt file): \c"
+                read list
+done
+}
+
+
+if [ -z $1 ]; then
+
+echo -e " #####################################################
+#                                                     #
+# This script will push a selected file to hosts      #
+#                                                     #
+# Usage:                                              #
+# $> . <script> <a file with host ips> <file to copy> #
+#            If file to copy is blank it will default #
+#     to the hosts file (/etc/hosts)                  #
+# or                                                  #
+# $> . <scrip> #Use the interactive mode              #
+#                                                     #
+#######################################################"
+
+        read -p "Press any key to continue"
+
+        echo -e "\n(Absolute path please)\nEnter file  to copy: \c"
+                read file
+        #file=/etc/hosts      # This was for testing
+
+        echo -e "\nPlease enter  list of IPs(txt file): \c"
+                read list
+                checkfile
+        #list=test2          # This was for testing
+
+elif [ $# -eq 1 ]; then
+        file=/etc/hosts
+        list=$1
+        checkfile
+
+else
+        file=$2
+        list=$1
+        checkfile
+fi
+
+
+while read hostip
+do
+        ssh -n $hostip "cp -p /etc/hosts /etc/hosts_bu && echo "$HOSTNAME - Host file has been renamed" "
+        scp -p $file root@$hostip:/etc/
+        echo -e "$hostip has been completed." >> completed_host
+
+done < $list
