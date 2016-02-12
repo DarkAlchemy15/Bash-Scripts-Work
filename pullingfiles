@@ -1,0 +1,76 @@
+#!/bin/bash
+
+checkfile(){
+        ##### Checks to see if file exist #####
+while [[ ! -f $list ]] ;do
+        echo -e "\nFile $list doesn't exit!\nPlease enter file with IP list: \c"
+        read list
+done
+}
+
+maybe(){
+case $hostip
+        in
+        stop)break;;
+        quit)exit;;
+esac
+}
+
+cont(){
+case $ans
+        in
+        n)exit;;
+        N)exit;;
+esac
+
+case $hostip
+        in
+        quit)exit;;
+        stop)exit;;
+        exit)exit;;
+esac
+}
+
+
+if [ $# -eq 0 ]; then
+
+echo -e "\n########################################################
+#                                                      #
+# Usage:                                               #
+# This script will read a list of IPs from a txt file  #
+# and copy down the hosts files to your local machine. #
+#                                                      #
+# cmd line parameters:                                 #
+#   >$ ./pullfile.sh <IP-list.txt>                     #
+# or                                                   #
+# Interactive mode:                                    #
+#   >$ ./pullfile.sh                                   #
+#                                                      #
+########################################################"
+
+        echo -e "\nWould you like to continue? [y/n] \c"
+        read ans
+        cont
+fi
+
+list=$1
+
+        ##### Pulling host file from host #####
+if [ -z $list ] ;then
+
+        while true
+        do
+                echo -e "\nEnter host IP address: \c"
+                read hostip
+                maybe
+
+                scp -p root@$hostip:/etc/hosts ~/$hostip
+                echo -e "\nhost-$hostip was created.\n"
+
+        done
+else
+        while read hostip ;do
+                scp -p root@$hostip:/etc/hosts ~/host-$hostip
+                echo -e "\nhost-$hostip was created.\n"
+        done < $list
+fi
