@@ -2,57 +2,86 @@
 
 #Pushing file to hosts
 
-checkfile(){
-while [[ ! -e $list ]]; do
-        echo -e "\nFile $list doesn't exitst"
+check-list(){
+while [[ ! -e $iplist ]]; do
+        echo -e "\nFile $iplist doesn't exitst"
         echo -e "Pleas enter the list of IP(txt file): \c"
-                read list
+                read iplist
 done
 }
 
+check-file(){
+while [[ ! -e $copyfile ]]; do
+        read -p "Please enter a vaild file path: " copyfile
+done
+}
 
 if [ -z $1 ]; then
 
-echo -e " #####################################################
-#                                                     #
-# This script will push a selected file to hosts      #
-#                                                     #
-# Usage:                                              #
-# $> . <script> <a file with host ips> <file to copy> #
-#            If file to copy is blank it will default #
-#     to the hosts file (/etc/hosts)                  #
-# or                                                  #
-# $> . <scrip> #Use the interactive mode              #
-#                                                     #
-#######################################################"
+echo -e " ######################################################
+#                                                      #
+# This script will push a selected file the /etc/ dir  #
+#  of specified host.                                  #
+#                                                      #
+# Usage:                                               #
+# Use this syntax if you have a list of IPs            #
+# $> ./<script> <file with ip list> <file to copy>     #
+#                                                      #
+# or                                                   #
+#                                                      #
+# Use this syntax to run it one host at a time         #
+# $> ./<script> #Use the interactive mode              #
+#                                                      #
+########################################################"
 
-        read -p "Press any key to continue"
+        read -p "Press any key to continue... "
 
-        echo -e "\n(Absolute path please)\nEnter file  to copy: \c"
-                read file
-        #file=/etc/hosts      # This was for testing
+        echo -e "\n(Please use the absolute path)\nEnter file to copy: \c"
+                read copyfile
+                check-file
 
-        echo -e "\nPlease enter  list of IPs(txt file): \c"
-                read list
-                checkfile
-        #list=test2          # This was for testing
+        echo -e "\nPlease enter IP: \c"
+                read singleip
+
 
 elif [ $# -eq 1 ]; then
-        file=/etc/hosts
-        list=$1
-        checkfile
+        copyfile=/etc/hosts
+        iplist=$1
+        check-list
 
 else
-        file=$2
-        list=$1
-        checkfile
+        iplist=$1
+        copyfile=$2
+        check-list
 fi
 
+echo -e "\n$(date)" >> completed_host
 
-while read hostip
-do
-        ssh -n $hostip "cp -p /etc/hosts /etc/hosts_bu && echo "$HOSTNAME - Host file has been renamed" "
-        scp -p $file root@$hostip:/etc/
-        echo -e "$hostip has been completed." >> completed_host
+if [ -z $singleip ]; then
 
-done < $list
+        while read hostip
+        do
+                echo -e "\nMaking a backup of $hostip's hosts file "
+                ssh -n $hostip "cp -p /etc/hosts /etc/hosts_bu "
+                echo -e "Copying new file to $hostip /etc/"
+                scp -p $copyfile root@$hostip:/etc/
+                echo -e "$hostip's hosts file has been changed." >> completed_host
+
+        done < $iplist
+else
+        while true
+         do
+                echo -e "\nMaking a backup of $hostip's hosts file "
+                ssh -n $singleip "cp -p /etc/hosts /etc/hosts_bu "
+                echo -e "Copying new file to $hostip /etc/"
+                scp -p $copyfile root@$singleip:/etc/
+                echo -e "$singleip's hosts file has been changed." >> completed_host
+
+                echo -e "\n(Absolute path please)\nEnter file to copy: \c"
+                read copyfile
+
+                echo -e "\nPlease enter IP: \c"
+                read singleip
+
+        done
+fi
