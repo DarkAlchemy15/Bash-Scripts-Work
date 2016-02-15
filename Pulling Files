@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#Pulling files from Host
+
 checkfile(){
         ##### Checks to see if file exist #####
 while [[ ! -f $list ]] ;do
@@ -17,11 +19,16 @@ esac
 }
 
 cont(){
-case $ans
-        in
-        n)exit;;
-        N)exit;;
-esac
+        while true; do
+        case $ans
+                in
+                n)exit;;
+                N)exit;;
+                y)break ;;
+                Y)break ;;
+                *)read -p "Would you like to continue? [y/n]" ans;;
+        esac
+done
 
 case $hostip
         in
@@ -65,12 +72,10 @@ if [ -z $list ] ;then
                 maybe
 
                 scp -p root@$hostip:/etc/hosts ~/$hostip
-                echo -e "\nhost-$hostip was created.\n"
 
         done
 else
         while read hostip ;do
                 scp -p root@$hostip:/etc/hosts ~/host-$hostip
-                echo -e "\nhost-$hostip was created.\n"
         done < $list
 fi
