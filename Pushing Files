@@ -3,7 +3,7 @@
 #Pushing file to hosts
 
 check-list(){
-while [[ ! -e $iplist ]]; do
+while [[ ! -f $iplist ]]; do
         echo -e "\nFile $iplist doesn't exitst"
         echo -e "Pleas enter the list of IP(txt file): \c"
                 read iplist
@@ -11,7 +11,7 @@ done
 }
 
 check-file(){
-while [[ ! -e $copyfile ]]; do
+while [[ ! -f $copyfile ]]; do
         read -p "Please enter a vaild file path: " copyfile
 done
 }
@@ -20,8 +20,8 @@ if [ -z $1 ]; then
 
 echo -e " ######################################################
 #                                                      #
-# This script will push a selected file the /etc/ dir  #
-#  of specified host.                                  #
+# This script will push a selected file the /etc/      #
+# directory of specified host.                         #
 #                                                      #
 # Usage:                                               #
 # Use this syntax if you have a list of IPs            #
