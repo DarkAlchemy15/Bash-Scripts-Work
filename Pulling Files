@@ -2,6 +2,10 @@
 
 #Pulling files from Host
 
+# Add the following:
+# echo when the file was created
+# save to a different location.
+
 checkfile(){
         ##### Checks to see if file exist #####
 while [[ ! -f $list ]] ;do
