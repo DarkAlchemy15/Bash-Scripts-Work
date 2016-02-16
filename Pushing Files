@@ -71,7 +71,7 @@ if [ -z $singleip ]; then
 
         done < $iplist
 else
-        echo "Try again"
+
         while true
          do
                 echo -e "\nMaking a backup of $hostip's hosts file "
