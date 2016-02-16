@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#Pushing file to hosts
+#Pushing file to hosts  v4
 
 check-list(){
 while [[ ! -f $iplist ]]; do
@@ -62,13 +62,16 @@ if [ -z $singleip ]; then
         while read hostip
         do
                 echo -e "\nMaking a backup of $hostip's hosts file "
-                ssh -n $hostip "cp -p /etc/hosts /etc/hosts_bu "
+                ssh -n root@$hostip "cp -p /etc/hosts /etc/hosts_bu"
                 echo -e "Copying new file to $hostip /etc/"
                 scp -p $copyfile root@$hostip:/etc/
+                echo -e "Adding itself to the hostfile"
+                ssh -n root@$hostip "echo "$hostip /bin/hostname" >> /etc/hosts "
                 echo -e "$hostip's hosts file has been changed." >> completed_host
 
         done < $iplist
 else
+        echo "Try again"
         while true
          do
                 echo -e "\nMaking a backup of $hostip's hosts file "
@@ -76,6 +79,9 @@ else
                 echo -e "Copying new file to $hostip /etc/"
                 scp -p $copyfile root@$singleip:/etc/
                 echo -e "$singleip's hosts file has been changed." >> completed_host
+                echo -e "Adding itself to the hostfile"
+                ssh -n root@$hostip "echo "$hostip /bin/hostname" >> /etc/hosts "
+
 
                 echo -e "\n(Absolute path please)\nEnter file to copy: \c"
                 read copyfile
