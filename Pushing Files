@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#Pushing file to hosts  v4
+#Pushing file to hosts v4
 
 check-list(){
 while [[ ! -f $iplist ]]; do
@@ -71,7 +71,6 @@ if [ -z $singleip ]; then
 
         done < $iplist
 else
-
         while true
          do
                 echo -e "\nMaking a backup of $hostip's hosts file "
