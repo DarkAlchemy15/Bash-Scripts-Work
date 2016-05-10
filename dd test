@@ -1,25 +1,46 @@
 #!/bin/bash
 
 usage(){ echo "
-#################################
-#                               #
-# Ussage:                       #
-#    $> ./<script> <ip list>    #
-#      Please use the absolute  #
-# file path for the ip list.    #
-#                               #
-#################################
+        ##########################################
+        #                                        #
+        # Ussage:                                #
+        #    $> ./<script> <ip list> <username>  #
+        #     *Please use the absolute file path #
+        #      for the ip list.                  #
+        #     *Default user is root              #
+        #     *Outputs results to ~/dd_test      #
+        #                                        #
+        ##########################################
 "
 }
 
 if [ $# -eq 0 ]; then #If the user runs the command it will display the usage statment
         usage
-elif [ $# -eq 1 ]; then #If there  something listed after the script then it will try and read it
+elif [ $# -eq 2 ]; then #If there  something listed after the script then it will try and read it
+    iplist=$1
+        user=$2
+    while read hostip #reads file (iplist) line by line
+    do
+        echo -e "\nRunning dd test on $hostip"
+        echo -e "$(tput setaf 1)Username: $user $(tput sgr0)"
+        ssh -n $user@$hostip 'count=1; while [[ $count -le 10 ]]; do (echo -e "\n Run $count   $(date)"; dd if=/dev/zero of=~/testfile bs=128k count=1000 oflag=direct; echo -e "\n" ) >>~/dd_test 2>&1; rm -f testfile; count=$(echo "$count+1" | bc ); done'
+        # SSH's into host, and runs a dd test command 10 times and writes it to a file called dd_test
+    done < $iplist #Wash rinse repeat
+
+elif [ $# -eq 1 ]; then
         iplist=$1
         while read hostip #reads file (iplist) line by line
-        do
-                echo -e "\nRunning dd test on $hostip"
-                ssh -n root@$hostip 'count=1; while [[ $count -le 10 ]]; do (echo -e "\n Run $count   $(date)"; dd if=/dev/zero of=~/testfile bs=128k count=1000 oflag=direct; echo -e "\n" ) >>~/dd_test 2>&1; rm -f testfile; count=$(echo "$count+1" | bc ); done'
-                  # SSH's into host, and runs a dd test command 10 times and writes it to a file called dd_test
-        done < $iplist #Rinse wash repeat
+    do
+        echo -e "\nRunning dd test on $hostip"
+        ssh -n root@$hostip 'count=1; while [[ $count -le 10 ]]; do (echo -e "\n Run $count   $(date)"; dd if=/dev/zero of=~/testfile bs=128k count=1000 oflag=direct; echo -e "\n" ) >>~/dd_test 2>&1; rm -f testfile; count=$(echo "$count+1" | bc ); done'
+        # SSH's into host, and runs a dd test command 10 times and writes it to a file called dd_test
+    done < $iplist #Rinse wash repeat
 fi
+
+# Break down of the dd test
+# dd if=/dev/zero of=~/testfile bs=128k count=1000 oflag=direct
+#   This will create a file called "testfile" with the size of "128k x 1000=128MB"
+#       This test the MB/s and how long it takes to create the file.
+#   oflag=direct --> Uses direct I/O for data (dsync uses synchrozed I/O for data)
+#   2>&1 --> This enables you to write the results to a file.
+#      the results are output as a standdard error so this redirect it to standard output
