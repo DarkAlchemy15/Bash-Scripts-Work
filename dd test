@@ -1,0 +1,10 @@
+#!/bin/bash
+if [ $# -eq 1 ]; then
+        iplist=$1
+
+        while read hostip
+        do
+                echo -e "\nSSH into $hostip"
+                ssh -n root@$hostip 'count=1; while [[ $count -le 10 ]]; do (echo -e "\n Run $count   $(date)"; dd if=/dev/zero of=~/testfile bs=128k count=1000 oflag=direct; echo -e "\n" ) >>~/dd_test 2>&1; rm -f testfile; count=$(echo "$count+1" | bc ); done'
+        done < $iplist
+fi
