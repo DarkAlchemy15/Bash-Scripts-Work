@@ -31,17 +31,17 @@ if [ $# -eq 2 ]; then
         ssh_key=$2
         check
 
-        while read hostip
+        while read hostip #Wash
         do
 
         key=$(cat ssh_key)
         echo -e "\n$(tput setaf 2)Pushing file out to host: $hostip $(tput sgr0)"
                 #Green text that lets you know what host you're working on
-        ssh -n root@$hostip "echo -e "$key" >> ~/etc/ssh/keys-root/authorized_keys" ";sed -i 's/ssh-rsa/\nssh-rsa /g' ~/etc/ssh/keys-root/authorized_keys "
+        ssh -n root@$hostip "echo -e "$key" >> ~/etc/ssh/keys-root/authorized_keys" ";sed -i 's/ssh-rsa/\nssh-rsa /g' ~/etc/ssh/keys-root/authorized_keys " #Rinse
                 #This will read line from "iplist" and set to value to "hostip", then it will ssh into the server and copy "key" to the autorized key file
                 #The sed command is only necessary if you have more than ssh key in the file. This will find every instance of ssh-rsa and insert a line break before ssh-rsa. This is necessary since when you cat the ssh_key to "key" it places everything on one line so you need to break that up.
         
-        done < $iplist #Wash Rinse Repeat 
+        done < $iplist #Repeat 
 else
         usage
 fi
