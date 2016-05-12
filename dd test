@@ -3,7 +3,7 @@
 usage(){ echo "
         ##########################################
         #                                        #
-        # Ussage:                                #
+        # Usage:                                #
         #    $> ./<script> <ip list> <username>  #
         #     *Please use the absolute file path #
         #      for the ip list.                  #
