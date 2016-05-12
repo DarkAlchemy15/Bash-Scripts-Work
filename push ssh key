@@ -1,0 +1,40 @@
+#!/bin/bash
+
+usage(){
+echo -e "
+        #############################################
+        #                                           #
+        #  Usage:                                   #
+        #    This script will edit the sshd_config  #
+        #    file to allow logon from will ssh key  #
+        #                                           #
+        #  To run the scipt:                        #
+        #    $> ./<script> iplist ssh-key           #
+        #     *The ssh-key is a txt file            #
+        #      with the key in it                   #
+        #     *iplist- single ip on each line       #
+        #                                           #
+        #############################################"
+}
+
+check(){
+while [[ ! -f $iplist ]]
+        do
+        echo -e "Please enter path for iplist: \c"
+        read iplist
+        done
+}
+
+if [ $# -eq 2 ]; then
+        iplist=$1
+        ssh_key=$2
+
+        while read hostip
+        do
+        key=$(cat ssh_key)
+        ssh -n root@$hostip "echo -e "$key" >> ~/etc/ssh/keys-root/authorized_keys "
+
+        done < $iplist
+else
+        usage
+fi
