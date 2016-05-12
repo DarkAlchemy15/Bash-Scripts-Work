@@ -5,13 +5,14 @@ echo -e "
         #############################################
         #                                           #
         #  Usage:                                   #
-        #    This script will edit the sshd_config  #
-        #    file to allow logon from will ssh key  #
+        #    This script will push out ssh keys     #
+        #    for ESXi hosts                         #
         #                                           #
         #  To run the scipt:                        #
-        #    $> ./<script> iplist ssh-key           #
+        #    $> ./<script> <iplist> <ssh-key>       #
         #     *The ssh-key is a txt file            #
         #      with the key in it                   #
+        #     *Only one ssh key per line            #
         #     *iplist- single ip on each line       #
         #                                           #
         #############################################"
@@ -28,11 +29,14 @@ while [[ ! -f $iplist ]]
 if [ $# -eq 2 ]; then
         iplist=$1
         ssh_key=$2
+        check
 
         while read hostip
         do
+
         key=$(cat ssh_key)
-        ssh -n root@$hostip "echo -e "$key" >> ~/etc/ssh/keys-root/authorized_keys "
+        echo -e "\n$(tput setaf 2)Pushing file out to host: $hostip $(tput sgr0)"
+        ssh -n root@$hostip "echo -e "$key" >> ~/etc/ssh/keys-root/authorized_keys" ";sed -i 's/ssh-rsa/\nssh-rsa /g' ~/etc/ssh/keys-root/authorized_keys "
 
         done < $iplist
 else
