@@ -1,0 +1,40 @@
+#!/bin/bash
+
+#Pulling IP information for debian machines
+usage(){ echo "
+        ##########################################
+        #                                        #
+        # Ussage:                                #
+        #    $> ./<script> <ip list> <username>  #
+        #     *Please use the absolute file path #
+        #      for the ip list.                  #
+        #     *Default user is root              #
+        #     *Outputs results to ~/ip-info      #
+        #                                        #
+        ##########################################
+"
+}
+
+if [ $# -eq 0 ]; then #If the user runs the command it will display the usage statment
+        usage
+elif [ $# -eq 2 ]; then #If there  something listed after the script then it will try and read it
+    iplist=$1
+    user=$2
+    while read hostip #reads file (iplist) line by line
+    do
+        echo -e "\n$(tput setaf 1)Pulling ip-info for host $hostip $(tput sgr0)"
+        echo -e "$(tput setaf 1)Username: $user $(tput sgr0)"
+        ssh -n $user@$hostip "cat /etc/network/interfaces >> ip-info"
+		scp $user@$hostip:~/ip-info ~/$hostip
+    done < $iplist #Wash rinse repeat
+
+elif [ $# -eq 1 ]; then
+        iplist=$1
+        while read hostip #reads file (iplist) line by line
+    do
+        echo -e "\n$(tput setaf 1)Pulling ip-info for host $hostip $(tput sgr0)"
+        echo -e "$(tput setaf 1)Username: root $(tput sgr0)"
+        ssh -n $user@$hostip "cat /etc/network/interfaces >> ip-info"
+		scp $user@$hostip:~/ip-info ~/$hostip
+    done < $iplist #Rinse wash repeat
+fi
